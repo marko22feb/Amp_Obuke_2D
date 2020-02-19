@@ -114,6 +114,7 @@ public class MovementComponent : MonoBehaviour
 
     private void Crouch(bool IsCrouching)
     {
+        //If on ground while Crouch is pressed set the boolean inside animation to same value as bool IsCrouching from the functions input.
         if (IsOnGround())
         {
             anim.SetBool("IsCrouching", IsCrouching);
@@ -121,25 +122,33 @@ public class MovementComponent : MonoBehaviour
 
         if (IsCrouching)
         {
+            //If crouching is true, set the height of the collider to be half of set size and it's wight to be 50% wider. also lower the collider a bit.
+            //This is because once he crouches in the animation his width gets .. wider. There is another way to do it, but this will suffice.
             boxcollider2D.size = new Vector2(colliderSize.x / 2, colliderSize.y * 1.5f);
             boxcollider2D.offset = new Vector2(colliderOffset.x, 0f);
+            //We cast a raycast to check if under is a board we can fall through.
             raycasthit2D = Physics2D.BoxCast(boxcollider2D.bounds.center, boxcollider2D.bounds.size, 0f, Vector2.down, 0.1f, floorLayerMask);
             if (raycasthit2D.collider != null)
             {
                 if (raycasthit2D.collider.tag == "Board")
                 {
+                    //Disable Update function in <OnJumpTrigger> of the board, because we are also checking if we need to enable/disable a trigger inside it. We do not want an overlap of code.
                     raycasthit2D.collider.GetComponent<OnJumpTrigger>().enabled = false;
+                    //Collider is set to be a trigger, which means we can pass through a collider and physics are ignored.
                     raycasthit2D.collider.isTrigger = true;
+                    //Start the IEnumerator EnableAgain().
                     StartCoroutine(EnableAgain());
                 }
             }
             }
         else {
+            //If we are not crouching return the size and offset of collider to normal.
             boxcollider2D.size = colliderSize;
             boxcollider2D.offset = colliderOffset;
         }
     }
 
+    //This simply gives you an option to delay a line of code. In this case we are enabling Update function in the Boards <OnJumpTrigger> component.
     IEnumerator EnableAgain()
     {
         yield return new WaitForSeconds(.1f);
