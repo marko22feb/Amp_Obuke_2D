@@ -13,6 +13,8 @@ public class MovementComponent : MonoBehaviour
     private Animator anim;
     private RaycastHit2D raycasthit2D;
     private BoxCollider2D boxcollider2D;
+    private Vector2 colliderSize;
+    private Vector2 colliderOffset;
     //I did not set LayerMask to be default in class, and only reason I set it to default is to avoid annoying false warning.
     [SerializeField] private LayerMask floorLayerMask = default;
 
@@ -26,6 +28,8 @@ public class MovementComponent : MonoBehaviour
         rigidbody2d = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         boxcollider2D = GetComponent<BoxCollider2D>();
+        colliderSize = boxcollider2D.size;
+        colliderOffset = boxcollider2D.offset;
     }
 
     private void Update()
@@ -37,6 +41,16 @@ public class MovementComponent : MonoBehaviour
         if (Input.GetAxis("Jump") > 0)
         {
             Jump();
+        }
+
+        if (Input.GetAxis("Crouch") > 0)
+        {
+            Crouch(true);
+        }
+
+        if (Input.GetAxis("Crouch") == 0)
+        {
+            Crouch(false);
         }
     }
 
@@ -96,5 +110,41 @@ public class MovementComponent : MonoBehaviour
         {
             rigidbody2d.velocity = new Vector2(rigidbody2d.velocity.x, JumpHeight);
         }
+    }
+
+    private void Crouch(bool IsCrouching)
+    {
+        if (IsOnGround())
+        {
+            anim.SetBool("IsCrouching", IsCrouching);
+        }
+
+        if (IsCrouching)
+        {
+            boxcollider2D.size = new Vector2(colliderSize.x / 2, colliderSize.y * 1.5f);
+            boxcollider2D.offset = new Vector2(colliderOffset.x, 0f);
+            raycasthit2D = Physics2D.BoxCast(boxcollider2D.bounds.center, boxcollider2D.bounds.size, 0f, Vector2.down, 0.1f, floorLayerMask);
+            if (raycasthit2D.collider != null)
+            {
+                if (raycasthit2D.collider.tag == "Board")
+                {
+                    raycasthit2D.collider.GetComponent<OnJumpTrigger>().enabled = false;
+                    raycasthit2D.collider.isTrigger = true;
+                    StartCoroutine(EnableAgain());
+                }
+            }
+            }
+        else {
+            boxcollider2D.size = colliderSize;
+            boxcollider2D.offset = colliderOffset;
+        }
+    }
+
+    IEnumerator EnableAgain()
+    {
+        yield return new WaitForSeconds(.1f);
+        raycasthit2D.collider.GetComponent<OnJumpTrigger>().enabled = true;
+        
+        StopCoroutine(EnableAgain());
     }
 }
