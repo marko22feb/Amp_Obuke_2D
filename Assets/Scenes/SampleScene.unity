@@ -248,6 +248,29 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &859427733 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5506103568800725204, guid: 41460201a09e6c14e93e0ac946459dbe,
+    type: 3}
+  m_PrefabInstance: {fileID: 5506103567495732044}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &859427739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 859427733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0baeca7edd16164bb8f22e3b473919e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minHP: 0
+  maxHP: 100
+  currentHP: 100
+  damage: 50
+  CanBeDealtDamage: 1
 --- !u!4 &960722033 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2082192601588686965, guid: 1b0cb4936583ab340b03a1b7aac487e2,
@@ -1539,6 +1562,8 @@ GameObject:
   - component: {fileID: 2058597907}
   - component: {fileID: 2058597906}
   - component: {fileID: 2058597911}
+  - component: {fileID: 2058597913}
+  - component: {fileID: 2058597912}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -1680,6 +1705,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   patrol: {fileID: 1687706438}
   Speed: 5
+--- !u!114 &2058597912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2058597905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f93bbde2438f3841ac9957619edf5b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2058597913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2058597905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0baeca7edd16164bb8f22e3b473919e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minHP: 0
+  maxHP: 100
+  currentHP: 100
+  damage: 50
+  CanBeDealtDamage: 1
 --- !u!1001 &2082192601441670148
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4961,6 +5015,11 @@ PrefabInstance:
     - target: {fileID: 5506103568800725204, guid: 41460201a09e6c14e93e0ac946459dbe,
         type: 3}
       propertyPath: m_Name
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 5506103568800725204, guid: 41460201a09e6c14e93e0ac946459dbe,
+        type: 3}
+      propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
