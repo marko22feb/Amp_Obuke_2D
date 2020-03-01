@@ -31,6 +31,8 @@ public class StatComponent : MonoBehaviour
 
     void OnDeath()
     {
+
+        //Time.timeScale sets the speed of the game. 0 = 0% , 0.1f = 10% , 1 = 100%
         if (tag == "Player")
         {
             Time.timeScale = 0;
