@@ -8,6 +8,7 @@ public class MovementComponent : MonoBehaviour
      * My English isn't perfect and it's self taught. Reason I am writing and commenting everything in English is to create a good practice. As you will often be in a situation where you will work with non-Slavs.
      * Whether as a freelancer or due to outsourcing. Grammar doesn't need to be perfect, it's enough to be understood by others.
      */
+    
     private Transform tr;
     private Rigidbody2D rigidbody2d;
     private Animator anim;
@@ -30,6 +31,7 @@ public class MovementComponent : MonoBehaviour
         boxcollider2D = GetComponent<BoxCollider2D>();
         colliderSize = boxcollider2D.size;
         colliderOffset = boxcollider2D.offset;
+        
     }
 
     private void Update()
