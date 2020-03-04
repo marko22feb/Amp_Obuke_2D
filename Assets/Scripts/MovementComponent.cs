@@ -13,13 +13,14 @@ public class MovementComponent : MonoBehaviour
     private Rigidbody2D rigidbody2d;
     private Animator anim;
     private RaycastHit2D raycasthit2D;
-    private BoxCollider2D boxcollider2D;
+    public BoxCollider2D groundBoxcollider2D;
     private Vector2 colliderSize;
     private Vector2 colliderOffset;
     //I did not set LayerMask to be default in class, and only reason I set it to default is to avoid annoying false warning.
     [SerializeField] private LayerMask floorLayerMask = default;
 
     public float Speed = 5;
+    public float airControl = .5f;
     public float JumpHeight = 500;
 
     void Start()
@@ -28,10 +29,9 @@ public class MovementComponent : MonoBehaviour
         tr = GetComponent<Transform>();
         rigidbody2d = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        boxcollider2D = GetComponent<BoxCollider2D>();
-        colliderSize = boxcollider2D.size;
-        colliderOffset = boxcollider2D.offset;
-        
+        groundBoxcollider2D = transform.GetChild(0).GetComponent<BoxCollider2D>();
+        colliderSize = groundBoxcollider2D.size;
+        colliderOffset = groundBoxcollider2D.offset;
     }
 
     private void Update()
@@ -45,7 +45,7 @@ public class MovementComponent : MonoBehaviour
             Jump();
         }
 
-        if (Input.GetAxis("Crouch") > 0)
+        if (Input.GetButtonDown("Crouch"))
         {
             Crouch(true);
         }
@@ -65,26 +65,35 @@ public class MovementComponent : MonoBehaviour
          * We set the velocity(Vector2) X to our preferred speed of movement, Y to current value since Y dictates how high the character will go.
          * We set Player rotation based on where we are moving. Finally we set "IsRunning" boolean inside of Player Animator to true.
          */
-        if (IsOnGround())
+        if (Input.GetAxis("Horizontal") > 0)
         {
-            if (Input.GetAxis("Horizontal") > 0)
-            {
-                rigidbody2d.velocity = new Vector2(Input.GetAxis("Horizontal") * Speed, rigidbody2d.velocity.y);
-                tr.rotation = new Quaternion(0, 0, 0, 0);
-                anim.SetBool("IsRunning", true);
-            }
-
-            if (Input.GetAxis("Horizontal") < 0)
-            {
-                rigidbody2d.velocity = new Vector2(Input.GetAxis("Horizontal") * Speed, rigidbody2d.velocity.y);
-                tr.rotation = new Quaternion(0, 180, 0, 0);
-                anim.SetBool("IsRunning", true);
-            }
+            Move(Input.GetAxis("Horizontal"));
+            tr.rotation = new Quaternion(0, 0, 0, 0);
+            anim.SetBool("IsRunning", true);
         }
+
+        if (Input.GetAxis("Horizontal") < 0)
+        {
+            Move(Input.GetAxis("Horizontal"));
+            tr.rotation = new Quaternion(0, 180, 0, 0);
+            anim.SetBool("IsRunning", true);
+        }
+
         //If we are not holding down movement buttons then we are setting boolean "IsRunning" inside of Player Animator to false.
         if (Input.GetAxis("Horizontal") == 0)
         {
             anim.SetBool("IsRunning", false);
+        }
+    }
+
+    private void Move(float move)
+    {
+        if (IsOnGround())
+            rigidbody2d.velocity = new Vector2(move * Speed, rigidbody2d.velocity.y);
+        else
+        {
+            rigidbody2d.velocity += new Vector2(move * Speed * airControl, 0);
+            rigidbody2d.velocity = new Vector2(Mathf.Clamp(rigidbody2d.velocity.x, -Speed, Speed), rigidbody2d.velocity.y);
         }
     }
 
@@ -98,7 +107,7 @@ public class MovementComponent : MonoBehaviour
         Forth is how far the ray will go. In this case it's 0.1f, so just a little bit under Players feet.
         And fifth input is what it will be able to hit, based on a layer mask.
         */
-        raycasthit2D = Physics2D.BoxCast(boxcollider2D.bounds.center, boxcollider2D.bounds.size, 0f, Vector2.down, 0.1f, floorLayerMask);
+        raycasthit2D = Physics2D.BoxCast(groundBoxcollider2D.bounds.center, groundBoxcollider2D.bounds.size, 0f, Vector2.down, 0.1f, floorLayerMask);
         if (raycasthit2D.collider != null)
         {
             return true;
@@ -126,36 +135,44 @@ public class MovementComponent : MonoBehaviour
         {
             //If crouching is true, set the height of the collider to be half of set size and it's wight to be 50% wider. also lower the collider a bit.
             //This is because once he crouches in the animation his width gets .. wider. There is another way to do it, but this will suffice.
-            boxcollider2D.size = new Vector2(colliderSize.x / 2, colliderSize.y * 1.5f);
-            boxcollider2D.offset = new Vector2(colliderOffset.x, 0f);
+            groundBoxcollider2D.size = new Vector2(colliderSize.x / 2, colliderSize.y * 1.5f);
+            groundBoxcollider2D.offset = new Vector2(colliderOffset.x, 0f);
             //We cast a raycast to check if under is a board we can fall through.
-            raycasthit2D = Physics2D.BoxCast(boxcollider2D.bounds.center, boxcollider2D.bounds.size, 0f, Vector2.down, 0.1f, floorLayerMask);
+            raycasthit2D = Physics2D.BoxCast(groundBoxcollider2D.bounds.center, groundBoxcollider2D.bounds.size, 0f, Vector2.down, 0.1f, floorLayerMask);
             if (raycasthit2D.collider != null)
             {
                 if (raycasthit2D.collider.tag == "Board")
                 {
-                    //Disable Update function in <OnJumpTrigger> of the board, because we are also checking if we need to enable/disable a trigger inside it. We do not want an overlap of code.
-                    raycasthit2D.collider.GetComponent<OnJumpTrigger>().enabled = false;
+                    OnJumpTrigger trigger = raycasthit2D.collider.gameObject.GetComponent<OnJumpTrigger>();
+                    trigger.enabled = false;
+                    foreach (GameObject gob in trigger.Neighbours)
+                    {
+                        gob.GetComponent<OnJumpTrigger>().enabled = false;
+                    }
                     //Collider is set to be a trigger, which means we can pass through a collider and physics are ignored.
-                    raycasthit2D.collider.isTrigger = true;
+                    trigger.ChangeTriggerValue(true);
                     //Start the IEnumerator EnableAgain().
-                    StartCoroutine(EnableAgain());
+                    StartCoroutine(EnableAgain(trigger));
                 }
             }
-            }
-        else {
+        }
+        else
+        {
             //If we are not crouching return the size and offset of collider to normal.
-            boxcollider2D.size = colliderSize;
-            boxcollider2D.offset = colliderOffset;
+            groundBoxcollider2D.size = colliderSize;
+            groundBoxcollider2D.offset = colliderOffset;
         }
     }
 
     //This simply gives you an option to delay a line of code. In this case we are enabling Update function in the Boards <OnJumpTrigger> component.
-    IEnumerator EnableAgain()
+    IEnumerator EnableAgain(OnJumpTrigger trigger)
     {
-        yield return new WaitForSeconds(.1f);
-        raycasthit2D.collider.GetComponent<OnJumpTrigger>().enabled = true;
-        
-        StopCoroutine(EnableAgain());
+        yield return new WaitForSeconds(0.5f);
+        foreach (GameObject gob in trigger.Neighbours)
+        {
+            gob.GetComponent<OnJumpTrigger>().enabled = true;
+        }
+
+        StopCoroutine(EnableAgain(trigger));
     }
 }

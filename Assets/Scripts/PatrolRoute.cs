@@ -8,6 +8,7 @@ public class PatrolRoute : MonoBehaviour
 {
     //List of child objects under this GameObject. Lists are a part of "using System.Collections.Generic;"
     public List<GameObject> patrolPoints;
+    public float allowedDistance = 1f;
 
 
 //Since we don't want this part to be executed in Play mode as well, we are making an if statement where we check if we are currently running in editor.
@@ -36,6 +37,8 @@ public class PatrolRoute : MonoBehaviour
         //Draw the line from each gameobject in the list.
         for (int i = 0; i < patrolPoints.Count -1; i++)
         {
+            float distance = Vector2.Distance(patrolPoints[i].transform.position, patrolPoints[i + 1].transform.position);
+            if (distance > allowedDistance) Gizmos.color = Color.red; else Gizmos.color = Color.green;
             Gizmos.DrawLine(patrolPoints[i].transform.position, patrolPoints[i + 1].transform.position);
                 }
     }
