@@ -23,6 +23,10 @@ public class MovementComponent : MonoBehaviour
     public float airControl = .5f;
     public float JumpHeight = 500;
 
+    private void Awake()
+    {
+        Time.timeScale = 1;
+    }
     void Start()
     {
         //Getting the references of variables from scene. All these variables are components added to GameObject by name of Player.
@@ -86,7 +90,7 @@ public class MovementComponent : MonoBehaviour
         }
     }
 
-    private void Move(float move)
+    public void Move(float move)
     {
         if (IsOnGround())
             rigidbody2d.velocity = new Vector2(move * Speed, rigidbody2d.velocity.y);
