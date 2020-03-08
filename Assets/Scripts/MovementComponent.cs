@@ -10,7 +10,7 @@ public class MovementComponent : MonoBehaviour
      */
     
     private Transform tr;
-    private Rigidbody2D rigidbody2d;
+    public Rigidbody2D rigidbody2d;
     private Animator anim;
     private RaycastHit2D raycasthit2D;
     public BoxCollider2D groundBoxcollider2D;
@@ -19,9 +19,11 @@ public class MovementComponent : MonoBehaviour
     //I did not set LayerMask to be default in class, and only reason I set it to default is to avoid annoying false warning.
     [SerializeField] private LayerMask floorLayerMask = default;
 
+    public bool IsUsingUIinput = false;
     public float Speed = 5;
     public float airControl = .5f;
     public float JumpHeight = 500;
+    public GameObject projectile;
 
     private void Awake()
     {
@@ -49,14 +51,25 @@ public class MovementComponent : MonoBehaviour
             Jump();
         }
 
-        if (Input.GetButtonDown("Crouch"))
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            Crouch(true);
+            GameObject temp;
+            temp = Instantiate(projectile);
+            temp.GetComponent<projectile>().x = rigidbody2d.velocity.x;
+            temp.GetComponent<projectile>().y = rigidbody2d.velocity.y;
         }
 
-        if (Input.GetAxis("Crouch") == 0)
+        if (!IsUsingUIinput)
         {
-            Crouch(false);
+            if (Input.GetButtonDown("Crouch"))
+            {
+                Crouch(true);
+            }
+
+            if (Input.GetAxis("Crouch") == 0)
+            {
+                Crouch(false);
+            }
         }
     }
 
@@ -69,18 +82,10 @@ public class MovementComponent : MonoBehaviour
          * We set the velocity(Vector2) X to our preferred speed of movement, Y to current value since Y dictates how high the character will go.
          * We set Player rotation based on where we are moving. Finally we set "IsRunning" boolean inside of Player Animator to true.
          */
-        if (Input.GetAxis("Horizontal") > 0)
+        if (Input.GetAxis("Horizontal") != 0)
         {
             Move(Input.GetAxis("Horizontal"));
-            tr.rotation = new Quaternion(0, 0, 0, 0);
-            anim.SetBool("IsRunning", true);
-        }
-
-        if (Input.GetAxis("Horizontal") < 0)
-        {
-            Move(Input.GetAxis("Horizontal"));
-            tr.rotation = new Quaternion(0, 180, 0, 0);
-            anim.SetBool("IsRunning", true);
+            
         }
 
         //If we are not holding down movement buttons then we are setting boolean "IsRunning" inside of Player Animator to false.
@@ -99,6 +104,11 @@ public class MovementComponent : MonoBehaviour
             rigidbody2d.velocity += new Vector2(move * Speed * airControl, 0);
             rigidbody2d.velocity = new Vector2(Mathf.Clamp(rigidbody2d.velocity.x, -Speed, Speed), rigidbody2d.velocity.y);
         }
+
+        if (move > 0)
+            tr.rotation = new Quaternion(0, 0, 0, 0);
+        else tr.rotation = new Quaternion(0, 180, 0, 0);
+        anim.SetBool("IsRunning", true);
     }
 
     private bool IsOnGround()
@@ -118,7 +128,7 @@ public class MovementComponent : MonoBehaviour
         }
         else return false;
     }
-    private void Jump()
+    public void Jump()
     {
         //If Player is on ground changed Psyhics velocity.Y to selected JumpHeight while velocity.X remains as is.
         if (IsOnGround())
@@ -127,7 +137,7 @@ public class MovementComponent : MonoBehaviour
         }
     }
 
-    private void Crouch(bool IsCrouching)
+    public void Crouch(bool IsCrouching)
     {
         //If on ground while Crouch is pressed set the boolean inside animation to same value as bool IsCrouching from the functions input.
         if (IsOnGround())

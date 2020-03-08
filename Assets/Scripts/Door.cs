@@ -20,7 +20,8 @@ public class Door : MonoBehaviour
             {
                 if (GameController.Control.GemAmount >= NeededGems)
                 {
-                    SceneManager.LoadScene("SampleScene");
+                    //SceneManager.LoadScene("SampleScene");
+                    SceneManager.LoadScene(0);
                 }
                 else {
                     if (spawnedText == null)
@@ -52,4 +53,6 @@ public class Door : MonoBehaviour
         spawnedText = null;
         StopCoroutine(DestroyText());
     }
+
+   
 }
