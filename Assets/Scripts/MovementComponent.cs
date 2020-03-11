@@ -24,10 +24,14 @@ public class MovementComponent : MonoBehaviour
     public float airControl = .5f;
     public float JumpHeight = 500;
     public GameObject projectile;
+    private Canvas Options_UI;
+    private Canvas Main_UI;
 
     private void Awake()
     {
         Time.timeScale = 1;
+        Options_UI = GameObject.Find("Options_UI").GetComponent<Canvas>();
+        Main_UI = GameObject.Find("Main_UI").GetComponent<Canvas>();
     }
     void Start()
     {
@@ -49,6 +53,22 @@ public class MovementComponent : MonoBehaviour
         if (Input.GetAxis("Jump") > 0)
         {
             Jump();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (Time.timeScale == 0)
+            {
+                Main_UI.enabled = true;
+                Options_UI.enabled = false;
+                Time.timeScale = 1;
+            }
+            else
+            {
+                Main_UI.enabled = false;
+                Options_UI.enabled = true;
+                Time.timeScale = 0;
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.E))
