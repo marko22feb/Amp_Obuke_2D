@@ -23,7 +23,6 @@ public class MovementComponent : MonoBehaviour
     public float Speed = 5;
     public float airControl = .5f;
     public float JumpHeight = 500;
-    public GameObject projectile;
     private Canvas Options_UI;
     private Canvas Main_UI;
 
@@ -69,14 +68,6 @@ public class MovementComponent : MonoBehaviour
                 Options_UI.enabled = true;
                 Time.timeScale = 0;
             }
-        }
-
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            GameObject temp;
-            temp = Instantiate(projectile);
-            temp.GetComponent<projectile>().x = rigidbody2d.velocity.x;
-            temp.GetComponent<projectile>().y = rigidbody2d.velocity.y;
         }
 
         if (!IsUsingUIinput)

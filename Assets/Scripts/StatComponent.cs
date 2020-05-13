@@ -32,7 +32,7 @@ public class StatComponent : MonoBehaviour
         hpSlider.value = currentHP;
     }
 
-    public void ModifyHealthBy(float by)
+    public void ModifyHealthBy(float by, float time)
     {
         if (CanBeDealtDamage)
         {
@@ -45,7 +45,8 @@ public class StatComponent : MonoBehaviour
                 GetComponent<Animator>().SetTrigger("IsHurt");
             }
 
-            if (by < 0) { CanBeDealtDamage = false; StartCoroutine(CanBeDamagedAgain()); }
+            if (by < 0) { CanBeDealtDamage = false; StartCoroutine(CanBeDamagedAgain(time));
+            }
         }
     }
 
@@ -74,11 +75,11 @@ public class StatComponent : MonoBehaviour
         StopCoroutine(DestroySelf());
     }
 
-    IEnumerator CanBeDamagedAgain()
+    IEnumerator CanBeDamagedAgain(float time)
     {
-        yield return new WaitForSeconds(3.5f);
+        yield return new WaitForSeconds(time);
         CanBeDealtDamage = true;
 
-        StopCoroutine(CanBeDamagedAgain());
+        StopCoroutine(CanBeDamagedAgain(0f));
     }
 }

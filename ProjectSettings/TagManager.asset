@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Board
+  - Enemies
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - Items
   - Enemies
   - Ignore
-  - 
+  - Projectile
   - 
   - 
   - 
@@ -41,4 +42,19 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: BackGround
+    uniqueID: 814746237
+    locked: 0
+  - name: Floor
+    uniqueID: 2799277323
+    locked: 0
+  - name: Units
+    uniqueID: 143339081
+    locked: 0
+  - name: Items
+    uniqueID: 72828793
+    locked: 0
+  - name: Traps
+    uniqueID: 3896060263
     locked: 0

@@ -8,7 +8,7 @@ public class DeathFloor : MonoBehaviour
     {
         if (collision.gameObject.GetComponent<StatComponent>() != null)
         {
-            collision.gameObject.GetComponent<StatComponent>().ModifyHealthBy(-9999);
+            collision.gameObject.GetComponent<StatComponent>().ModifyHealthBy(-9999, 0);
         }
     }
 }
